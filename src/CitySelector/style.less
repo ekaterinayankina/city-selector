@@ -2,4 +2,52 @@
     float: right;
 }
 
-// Your code...
+@color-gray_light: #cccccc;
+@color-chirstmas_red: #941f1f;
+@color-gray:#34495e;
+
+body {
+    background: #2c3e50;
+    color: #fff;
+}
+.button{
+    background: #2c3e50;
+    color: #fff;
+    @unit: 1px;
+    border:@unit solid #2c3e50;
+}
+.save .button{
+    background: @color-chirstmas_red;
+    margin: 10px 10px 5px 10px;
+}
+.down{
+    background: @color-chirstmas_red;
+}
+.selectRegion{
+    background: #2c3e50;
+    color: #fff;
+    @unit: 1px;
+    border:@unit solid #2c3e50;
+    display:inline-block;
+    vertical-align:top;
+    overflow:hidden;
+}
+.selectCity{
+    background: #2c3e50;
+    color: #fff;
+    @unit: 1px;
+    border:@unit solid #2c3e50;
+    display:inline-block;
+    vertical-align:top;
+    overflow:hidden;
+}
+select {
+    font-size:17px;
+    padding:10px;
+    margin: 10px -20px 5px 5px;
+    line-height:50px;
+}
+:focus {
+    outline: none;
+}
+.hidden { display:none; }
