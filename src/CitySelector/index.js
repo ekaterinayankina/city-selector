@@ -1,164 +1,128 @@
 require('./style.less');
-var stateful = {
-    none: 0,
-    selectRegion: 1,
-    selectCity: 2
-};
-class CitySelector{
-    constructor(selector, holder) {
-        this.state = stateful.none;
 
-        this.holder = holder;
-        this.elementId = selector.elementId;
-        this.regionsUrl = selector.regionsUrl;
-        this.localitiesUrl = selector.localitiesUrl;
-        this.saveUrl = selector.saveUrl;
-        this.selected = {region:0, city:""};
+//TODO
+//Кэш
+//Вывод результата
+//паттерн подписчик
+export default class CitySelector {
 
-        holder.append('<button id="regionButton" class="button">Выбрать регион</button>');
-        holder.append('<select id="regionSelector" class="selectRegion select hidden"></select>');
-        holder.append('<select id="citySelector" class="selectCity select hidden"></select>');
-        holder.append('<button id="saveButton" class="button save hidden">Сохранить</button>');
+    constructor(options) {
+        this.elementId = options.elementId;
+        this.regionsUrl = options.regionsUrl;
+        this.localitiesUrl = options.localitiesUrl;
+        this.saveUrl = options.saveUrl;
+        this.selected = {region: 0, city: ""};
 
-        this.regionButton = $(holder).find('#regionButton');
-        this.regionSelector = $(holder).find('#regionSelector');
-        this.citySelector = $(holder).find('#citySelector');
-        this.saveButton = $(holder).find('#saveButton');
-        var component = this;
+        let tempText = "#" + this.elementId;
+        this.scoreboard = $(tempText);
 
-        this.regionButton.on('click', function(e) {
-            component.selectRegion();
-        });
-        this.saveButton.on('click', function(e) {
-            component.save();
-        });
-
+        this.initEvents();
     }
-    selectRegion(){
-        this.regionButton.css('display','none');//!
-        var component = this;
-        component.regionSelector.size = 3;
-        var jqxhrRegion = $.getJSON(component.regionsUrl, function() {
 
-            console.log("success");
+    initEvents() {
+        this.addEl(this.scoreboard);
 
-        }).done(function(data) {
-            var items = [];
-            $.each( data, function( key, item ) {
-                items.push( "<option value='" + item.id + "'>" + item.title + "</option>" );
+        this.regionButton = this.findEl('.buttonRegion');
+        this.regionSelector = this.findEl('.selectRegion');
+        this.citySelector = this.findEl('.selectCity');
+        this.saveButton = this.findEl('.save');
+
+        this.regionButton.on('click', () => {
+            this.selectRegion();
+        });
+        this.saveButton.on('click', () => {
+            this.save();
+        });
+    }
+
+    findEl(className) {
+        return $($(this.scoreboard).find(className)[0]);
+    }
+
+    addEl(target) {
+        target.append('<button  class="buttonRegion">Выбрать регион</button>');                          //?
+        target.append('<select  class="selectRegion select hidden"></select>');                  //?
+        target.append('<select  class="selectCity select hidden"></select>');                      //?
+        target.append('<button  class="button save hidden">Сохранить</button>');                     //?
+    }
+
+    selectRegion() {
+        this.regionButton.addClass('hidden');
+        this.regionSelector.size = 3;                                   //?
+        let jqxhrRegion = $.getJSON(this.regionsUrl, () => {
+            console.log("getJSON region callback");
+        }).done((data) => {
+            let items = [];
+            $.each(data, (key, item) => {
+                items.push("<option value='" + item.id + "'>" + item.title + "</option>");
             });
             //создание списка регионов
-            component.regionSelector.empty();
-            component.regionSelector.attr('size',items.length);
-            component.regionSelector.html(items.join(''));
-            component.regionSelector.removeClass('hidden');
+            this.renderElement(this.regionSelector, items);
             //обработка выбранного региона
-            component.regionSelector.on('change', function() {
-                this.state = stateful.selectRegion;
-                component.saveButton.attr("disabled", "disabled");
-                var optionSelected = $("option:selected", this);
-                component.selected.region = this.value;
-                component.holder.trigger("changed:region");
-
-                component.selected.city = "";
-                component.selectCity();
-                component.holder.trigger('changed:city');
+            this.regionSelector.on('change', () => {
+                this.saveButton.attr("disabled", "disabled");
+                this.selected.region = this.regionSelector[0].value;
+                this.scoreboard.trigger('changed:region');
+                this.selected.city = "";
+                this.selectCity();
+                this.scoreboard.trigger('changed:city');
             });
+            console.log("regions loaded");
         })
-            .fail(function() { console.log("error");});
+            .fail(() => {
+                console.log("error");
+            });
     }
-    selectCity(){
-        var component = this;
-        var url = this.localitiesUrl+'/'+component.selected.region.toString();
-        var jqxhrCity = $.getJSON(url, function() {
-            console.log( "success" );
-        }).done(function(data) {
-            var items = [];
-            $.each( data.list, function( key, item ) {
-                items.push( "<option value='" + item + "'>" + item + "</option>" );
+
+    selectCity() {
+        let url = this.localitiesUrl + '/' + this.selected.region.toString();
+        let jqxhrCity = $.getJSON(url, () => {
+            console.log("getJSON locality callback");
+        }).done((data) => {
+            let items = [];
+            $.each(data.list, function (key, item) {
+                items.push("<option value='" + item + "'>" + item + "</option>");
             });
             //если список городов уже есть, то замена значений
-            component.citySelector.empty();
-            component.citySelector.attr('size',items.length);
-            component.citySelector.html(items.join(''));
-            component.citySelector.removeClass('hidden');
+            this.renderElement(this.citySelector, items);
             //обработка выбранного города
-            component.citySelector.on('change', function() {
-                this.state = stateful.selectCity;
-                component.saveButton.removeAttr("disabled");
-                var optionSelected = $("option:selected", this);
-                var city = this.value;
-                component.selected.city = city;
-                component.saveButton.removeClass('hidden');
-                component.holder.trigger("changed:city");
+            this.citySelector.on('change', () =>{
+                this.saveButton.removeAttr("disabled");
+                this.selected.city = this.citySelector[0].value;
+                this.saveButton.removeClass('hidden');
+                this.scoreboard.trigger("changed:city");
             });
-        }).fail(function() {
-            console.log( "error" );
+            console.log("success");
+        }).fail(() => {
+            console.log("error");
         })
     }
+
     save() {
         this.saveButton.attr("disabled", "disabled");
-        var data = JSON.stringify(this.selected);
-        var component = this;
-        var request = $.ajax({
+        let data = JSON.stringify(this.selected);
+        let component = this;
+        let request = $.ajax({
             method: "POST",
             url: this.saveUrl,
             contentType: 'application/json',
             data: data,
-        }).done(function() {
+        }).done(() => {
             component.saveButton.removeClass('hidden');
             console.log("saved");
-        }).fail(function() {
+        }).fail(() => {
             component.saveButton.removeClass('hidden');
-            console.log( "error" );
+            console.log("error");
         });
 
     }
+
+    renderElement(el, items) {
+        el.empty();
+        el.attr('size', items.length);
+        el.html(items.join(''));
+        el.removeClass('hidden');
+    }
 }
-
-$(document).ready(function () {
-    $('button').mousedown(function () {
-        $(this).addClass("down");
-    });
-    $('button').mouseup(function () {
-        $(this).removeClass("down");
-    });
-
-//При выборе региона появляется список его населенных пунктов (запросить аяксом с http://localhost:3000/localities/[regionId]).
-//При выборе населенного пункта появляется кнопка «Сохранить». Если населенный пункт не выбран, кнопка должна быть заблокирована (свойство disabled).
-//При сохранении, id региона и название населенного пункта отсылаются синхронным POST-запросом на http://localhost:3000/selectedRegions.
-
-    var regionInfo = $('#info #regionText');
-    var locationInfo = $('#info #localityText');
-
-    $('#createCitySelector').on('click', function (event) {
-        if(event.originalEvent){
-            $('#createCitySelector').attr("disabled", "disabled");
-            $('#info').css('display','block');
-            var selector = new CitySelector({
-                elementId: 'citySelector',
-                regionsUrl: 'http://localhost:3000/regions',
-                localitiesUrl: 'http://localhost:3000/localities',
-                saveUrl: 'http://localhost:3000/selectedRegions'
-            }, $('#citySelector'));
-
-            $('#citySelector').on('changed:city', function(e) {
-                locationInfo.text(selector.selected.city);
-            });
-            $('#citySelector').on('changed:region', function(e) {
-                regionInfo.text(selector.selected.region);
-            });
-        }
-    });
-
-    $('#destroyCitySelector').click(function () {
-        $("#citySelector").empty();
-        $('#createCitySelector').removeAttr("disabled");
-        locationInfo.text("");
-        regionInfo.text("");
-        delete selector;
-    });
-
-});
 
 
