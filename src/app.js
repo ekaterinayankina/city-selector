@@ -1,5 +1,4 @@
-import CitySelector from './CitySelector';
-import InfoComponent from './InfoComponent';
+import {CitySelector, InfoComponent}  from './CitySelector';
 
 $(document).ready(() => {
     let $regionInfo = $('#regionText');
@@ -13,18 +12,11 @@ $(document).ready(() => {
     let $selectors = [];
     let selectorsCount = 0;
 
-    //Создание компонента для вывода информации о выбранном регионе, городе
-    new InfoComponent({
-        componentId: $info,
-        regionInfo: $regionInfo,
-        locationInfo: $locationInfo
-    });
-    $info.css('display', 'block');
-
 
     //Создание компонента селектора
     $createSelector.on('click', (e) => {
         if (!e.originalEvent) return;
+        if (selectorsCount === 0) createInfoComponent($info, $regionInfo, $locationInfo, $selectors);
 
         let newId = 'citySelector'+ selectorsCount.toString();
         $selectors.push(newId);
@@ -37,6 +29,8 @@ $(document).ready(() => {
             localitiesUrl: 'http://localhost:3001/localities',
             saveUrl: 'http://localhost:3001/selectedRegions',
         });
+
+        $info.trigger('new-selector', [newId]);
 
         selectorsCount++;
     });
@@ -64,4 +58,16 @@ function btnBlink(btn){
     btn.mouseup(function () {
         $(this).removeClass("down");
     });
+}
+
+
+//Создание компонента для вывода информации о выбранном регионе, городе
+function createInfoComponent($info, $regionInfo, $locationInfo, $selectors) {
+    new InfoComponent({
+        componentId: $info,
+        regionInfo: $regionInfo,
+        locationInfo: $locationInfo,
+        selectors: $selectors
+    });
+    $info.css('display', 'block');
 }

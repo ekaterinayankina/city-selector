@@ -1,6 +1,6 @@
 require('./style.less');
 
-export default class CitySelector {
+export class CitySelector {
 
     constructor(options) {
         this.selector = $('#' + options.elementId);
@@ -8,9 +8,6 @@ export default class CitySelector {
         this.localitiesUrl = options.localitiesUrl;
         this.saveUrl = options.saveUrl;
         this.selected = {region: 0, city: ""};
-
-        this.regionInfo = options.regionInfo;
-        this.locationInfo = options.locationInfo;
         this.cache = [];
 
         this.initEvents();
@@ -31,15 +28,16 @@ export default class CitySelector {
         this.saveButton.on('click', () => {
             this.save();
         });
-
-        this.selector.on('changed:city', () => {
-            this.regionInfo.text(this.selected.region);
-            this.locationInfo.text(this.selected.city);
-        });
-
-        this.selector.on('changed:region', () => {
-            this.regionInfo.text(this.selected.region);
-        });
+        //
+        // this.selector.on('changed:city', (event, region, city) => {
+        //     this.regionInfo.text(region);
+        //     this.locationInfo.text(city);
+        // });
+        //
+        // this.selector.on('changed:region', (event, region) =>{
+        //     console.log(region);
+        //     this.regionInfo.text(region);
+        // });
     }
 
     findElement(className) {
@@ -70,10 +68,10 @@ export default class CitySelector {
             this.regionSelector.on('change', () => {
                 this.saveButton.attr("disabled", "disabled");
                 this.selected.region = this.regionSelector[0].value;
-                this.selector.trigger('changed:region');
+                this.selector.trigger('changed:region', [this.selected.region]);
                 this.selected.city = "";
                 this.selectCity();
-                this.selector.trigger('changed:city');
+                this.selector.trigger('changed:city', [this.selected.region, this.selected.city]);
             });
             console.log("regions loaded");
         })
@@ -93,7 +91,7 @@ export default class CitySelector {
             this.saveButton.removeAttr("disabled");
             this.selected.city = this.citySelector[0].value;
             this.saveButton.removeClass('hidden');
-            this.selector.trigger("changed:city");
+            this.selector.trigger('changed:city', [this.selected.region, this.selected.city]);
         });
 
     }
@@ -160,22 +158,32 @@ export default class CitySelector {
     }
 }
 
-export default class InfoComponent {
+export class InfoComponent {
 
     constructor(options) {
+        this.componentId = options.componentId,
         this.regionInfo = options.regionInfo;
         this.locationInfo = options.locationInfo;
         this.initEvents();
     }
 
-    initEvents(){
-        this.selector.on('changed:city', () => {
-            this.regionInfo.text(this.selected.region);
-            this.locationInfo.text(this.selected.city);
-        });
+    initEvents() {
+        //при создании нового селектора-компонента, на него навешивается событие on, которое он тригерит при выборе элемента
 
-        this.selector.on('changed:region', () => {
-            this.regionInfo.text(this.selected.region);
+        this.componentId.on('new-selector', (e, id) => {
+            console.log(id);
+
+            let selector = $('#' + id);
+
+            selector.on('changed:city', (e, region, city) => {
+                this.regionInfo.text(region);
+                this.locationInfo.text(city);
+            });
+
+            selector.on('changed:region', (e, region) => {
+                this.regionInfo.text(region);
+            });
+
         });
     }
 }
