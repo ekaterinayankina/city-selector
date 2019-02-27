@@ -1,4 +1,5 @@
 import CitySelector from './CitySelector';
+import InfoComponent from './InfoComponent';
 
 $(document).ready(() => {
     let $regionInfo = $('#regionText');
@@ -12,11 +13,18 @@ $(document).ready(() => {
     let $selectors = [];
     let selectorsCount = 0;
 
+    //Создание компонента для вывода информации о выбранном регионе, городе
+    new InfoComponent({
+        componentId: $info,
+        regionInfo: $regionInfo,
+        locationInfo: $locationInfo
+    });
+    $info.css('display', 'block');
 
+
+    //Создание компонента селектора
     $createSelector.on('click', (e) => {
         if (!e.originalEvent) return;
-        //$createSelector.attr("disabled", "disabled");
-        $info.css('display', 'block');
 
         let newId = 'citySelector'+ selectorsCount.toString();
         $selectors.push(newId);
@@ -28,13 +36,12 @@ $(document).ready(() => {
             regionsUrl: 'http://localhost:3001/regions',
             localitiesUrl: 'http://localhost:3001/localities',
             saveUrl: 'http://localhost:3001/selectedRegions',
-            regionInfo: $regionInfo,
-            locationInfo: $locationInfo
         });
 
         selectorsCount++;
     });
 
+    //Удаление компонента селектора
     $destroySelector.on ('click', () => {
         let lastElement = $selectors[$selectors.length-1];
         let lastSelector = $('#' + lastElement);
