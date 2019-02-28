@@ -28,16 +28,6 @@ export class CitySelector {
         this.saveButton.on('click', () => {
             this.save();
         });
-        //
-        // this.selector.on('changed:city', (event, region, city) => {
-        //     this.regionInfo.text(region);
-        //     this.locationInfo.text(city);
-        // });
-        //
-        // this.selector.on('changed:region', (event, region) =>{
-        //     console.log(region);
-        //     this.regionInfo.text(region);
-        // });
     }
 
     findElement(className) {
