@@ -7,11 +7,12 @@ $(document).ready(() => {
     const $info = $('#info');
     const $createSelector = $('#createCitySelector');
     const $destroySelector = $('#destroyCitySelector');
-    btnBlink($createSelector);
-    btnBlink($destroySelector);
     let $selectors = [];
     let selectorsCount = 0;
 
+    //Добавление стилей кнопкам
+    $createSelector.addClass('btn btn-dark');
+    $destroySelector.addClass('btn btn-light');
 
     //Создание компонента селектора
     $createSelector.on('click', (e) => {
@@ -66,14 +67,3 @@ function createInfoComponent($info, $regionInfo, $locationInfo, $selectors) {
     });
     $info.css('display', 'block');
 }
-
-
-function btnBlink(btn){
-    btn.mousedown(function () {
-        $(this).addClass("down");
-    });
-    btn.mouseup(function () {
-        $(this).removeClass("down");
-    });
-}
-

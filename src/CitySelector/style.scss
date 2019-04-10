@@ -1,0 +1,47 @@
+@import '_custom-variables';
+@import '~bootstrap/scss/bootstrap';
+
+#info {
+    float: right;
+    margin-right: 30px;
+}
+
+body {
+    margin: 10px;
+    background: $background-color;
+}
+
+.btn-dark{
+    margin: 5px;
+    &:hover {
+        background-color: $color-golden;
+        border-color: $color-golden;
+    }
+}
+
+.select {
+    display: inline-block;
+    vertical-align:top;
+    overflow:hidden;
+    width: auto;
+    font-size:17px;
+    padding:10px;
+    margin: 10px 5px;
+    line-height:50px;
+}
+
+.formResult {
+    font-size: medium;
+}
+
+.save {
+    margin-top: 10px;
+}
+
+.hidden {
+    display:none;
+}
+
+.shown {
+    display: block;
+}
