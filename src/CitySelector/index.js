@@ -14,7 +14,7 @@ export class CitySelector {
     }
 
     initEvents() {
-        this.renderComponent(this.selector);
+        CitySelector.renderComponent(this.selector);
 
         this.regionButton = this.findElement('.buttonRegion');
         this.regionSelector = this.findElement('.selectRegion');
@@ -34,7 +34,7 @@ export class CitySelector {
         return $($(this.selector).find(className)[0]);
     }
 
-    renderComponent(target) {
+    static renderComponent(target) {
         target.append('<button  class="buttonRegion">Выбрать регион</button>');
         target.append('<select  class="selectRegion select hidden"></select>');
         target.append('<select  class="selectCity select hidden"></select>');
@@ -45,7 +45,8 @@ export class CitySelector {
     selectRegion() {
         this.regionButton.addClass('hidden');
         this.regionSelector.size = 3;
-        let regionRequest = $.getJSON(this.regionsUrl, () => {
+
+        $.getJSON(this.regionsUrl, () => {
             console.log("getJSON region callback");
         }).done((data) => {
             let items = [];
@@ -53,7 +54,7 @@ export class CitySelector {
                 items.push("<option value='" + item.id + "'>" + item.title + "</option>");
             });
             //создание списка регионов
-            this.renderList(this.regionSelector, items);
+            CitySelector.renderList(this.regionSelector, items);
             //обработка выбранного региона
             this.regionSelector.on('change', () => {
                 this.saveButton.attr("disabled", "disabled");
@@ -74,7 +75,7 @@ export class CitySelector {
         let isInCache = this.cache.find(x => x.id === this.selected.region.toString().list);
         if (!isInCache) this.getCityList(this.cache);
         let cityList = this.cache.filter(x => x.id === this.selected.region.toString()).map(x => x.list)[0];
-        this.renderList(this.citySelector, cityList);
+        CitySelector.renderList(this.citySelector, cityList);
 
         //обработка выбранного города
         this.citySelector.on('change', () => {
@@ -89,7 +90,7 @@ export class CitySelector {
     save() {
         this.saveButton.attr("disabled", "disabled");
         let data = JSON.stringify(this.selected);
-        let saveDataRequest = $.ajax({
+        $.ajax({
             method: "POST",
             async: false,
             url: this.saveUrl,
@@ -100,15 +101,13 @@ export class CitySelector {
             console.log("saved");
             //вывод результата
             this.renderResult(this.selector, this.selected);
-
-
         }).fail(() => {
             this.saveButton.removeClass('hidden');
             console.log("error");
         });
     }
 
-    renderList(el, items) {
+    static renderList(el, items) {
         el.empty();
         el.attr('size', items.length);
         el.html(items.join(''));
@@ -148,10 +147,12 @@ export class CitySelector {
     }
 }
 
+
+//Компонент для вывода информации о выбранном регионе, городе
 export class InfoComponent {
 
     constructor(options) {
-        this.componentId = options.componentId,
+        this.componentId = options.componentId;
         this.regionInfo = options.regionInfo;
         this.locationInfo = options.locationInfo;
         this.initEvents();

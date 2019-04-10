@@ -1,12 +1,12 @@
 import {CitySelector, InfoComponent}  from './CitySelector';
 
 $(document).ready(() => {
-    let $regionInfo = $('#regionText');
-    let $locationInfo = $('#localityText');
-    let $selector = $('#citySelector');
-    let $info = $('#info');
-    let $createSelector = $('#createCitySelector');
-    let $destroySelector = $('#destroyCitySelector');
+    const $regionInfo = $('#regionText');
+    const $locationInfo = $('#localityText');
+    const $selector = $('#citySelector');
+    const $info = $('#info');
+    const $createSelector = $('#createCitySelector');
+    const $destroySelector = $('#destroyCitySelector');
     btnBlink($createSelector);
     btnBlink($destroySelector);
     let $selectors = [];
@@ -16,9 +16,11 @@ $(document).ready(() => {
     //Создание компонента селектора
     $createSelector.on('click', (e) => {
         if (!e.originalEvent) return;
-        if (selectorsCount === 0) createInfoComponent($info, $regionInfo, $locationInfo, $selectors);
+        if (selectorsCount === 0) {
+            createInfoComponent($info, $regionInfo, $locationInfo, $selectors);
+        }
 
-        let newId = 'citySelector'+ selectorsCount.toString();
+        const newId = 'citySelector'+ selectorsCount.toString();
         $selectors.push(newId);
         console.log('new CitySelector: ' + newId);
         $selector.append("<div  id=\'" + newId + "\'></div>");
@@ -37,8 +39,8 @@ $(document).ready(() => {
 
     //Удаление компонента селектора
     $destroySelector.on ('click', () => {
-        let lastElement = $selectors[$selectors.length-1];
-        let lastSelector = $('#' + lastElement);
+        const lastElement = $selectors[$selectors.length-1];
+        const lastSelector = $('#' + lastElement);
         lastSelector.remove();
         console.log('delete CitySelector: ' + lastElement);
         $selectors.pop();
@@ -46,19 +48,12 @@ $(document).ready(() => {
 
         $locationInfo.text("");
         $regionInfo.text("");
-        if (selectorsCount === 0) $info.css('display', 'none');
+        if (selectorsCount === 0) {
+            $info.css('display', 'none');
+        }
     });
 
 });
-
-function btnBlink(btn){
-    btn.mousedown(function () {
-        $(this).addClass("down");
-    });
-    btn.mouseup(function () {
-        $(this).removeClass("down");
-    });
-}
 
 
 //Создание компонента для вывода информации о выбранном регионе, городе
@@ -71,3 +66,14 @@ function createInfoComponent($info, $regionInfo, $locationInfo, $selectors) {
     });
     $info.css('display', 'block');
 }
+
+
+function btnBlink(btn){
+    btn.mousedown(function () {
+        $(this).addClass("down");
+    });
+    btn.mouseup(function () {
+        $(this).removeClass("down");
+    });
+}
+
