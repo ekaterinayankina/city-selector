@@ -1,5 +1,5 @@
 const path = require('path');
-
+const ExtractTextPlugin = require('extract-text-webpack-plugin');
 module.exports = {
     devtool: 'source-map',
     entry: [
@@ -9,15 +9,24 @@ module.exports = {
         path: path.join(__dirname, 'build'),
         filename: 'bundle.js'
     },
+
     module: {
-        loaders: [
+        rules: [
             {
                 test: /\.css$/,
-                loaders: ['style-loader', 'css-loader']
+                use: ExtractTextPlugin.extract(
+                    {
+                        fallback: 'style-loader',
+                        use: ['css-loader']
+                    })
             },
             {
-                test: /\.less$/,
-                loaders: ['style-loader', 'css-loader', 'less-loader']
+                test: /\.scss$/,
+                use:[
+                    'style-loader',
+                    'css-loader',
+                    'sass-loader'
+                ]
             }
         ]
     }

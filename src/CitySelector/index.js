@@ -1,4 +1,4 @@
-require('./style.less');
+require('./style.scss');
 
 export class CitySelector {
 
@@ -35,10 +35,10 @@ export class CitySelector {
     }
 
     static renderComponent(target) {
-        target.append('<button  class="buttonRegion">Выбрать регион</button>');
-        target.append('<select  class="selectRegion select hidden"></select>');
-        target.append('<select  class="selectCity select hidden"></select>');
-        target.append('<button  class="button save hidden">Сохранить</button>');
+        target.append('<button  class="buttonRegion btn btn-dark">Выбрать регион</button>');
+        target.append('<select  class="selectRegion select form-control hidden"></select>');
+        target.append('<select  class="selectCity select form-control hidden"></select>');
+        target.append('<button  class="button save btn btn-dark hidden">Сохранить</button>');
         target.append('<h3  class="formResult hidden"></h3>');
     }
 
